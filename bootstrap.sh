@@ -1,53 +1,90 @@
 #!/bin/bash
-# Bootstrap Skript für Debian
 
-# ========================
-# Konfiguration
-# ========================
-USERNAME="${1:-debian}"        # Standard: debian, kann als Argument übergeben werden
-PASSWORD="${2:-changeme}"      # Standardpasswort
-SUDO="${3:-yes}"               # yes/no
-INSTALL_DOCKER="${4:-yes}"     # yes/no
-# ========================
+# ==============================
+# Debian Interaktives Setup
+# ==============================
 
-# Nur als root ausführbar
+# Root-Check
 if [ "$(id -u)" -ne 0 ]; then
-    echo "Bitte als root ausführen!"
+    echo "❌ Bitte als root ausführen!"
     exit 1
 fi
 
-# User erstellen
-if id "$USERNAME" &>/dev/null; then
-    echo "User $USERNAME existiert bereits."
-else
-    echo "Erstelle Benutzer $USERNAME..."
-    adduser --disabled-password --gecos "" "$USERNAME"
-    echo "$USERNAME:$PASSWORD" | chpasswd
+echo "=============================="
+echo " Debian Bootstrap Setup"
+echo "=============================="
 
-    if [ "$SUDO" = "yes" ]; then
-        usermod -aG sudo "$USERNAME"
-        echo "$USERNAME wurde zur sudo-Gruppe hinzugefügt."
-    fi
+# Benutzername
+read -p "Neuen Benutzernamen festlegen: " USERNAME
+
+if id "$USERNAME" &>/dev/null; then
+    echo "❌ Benutzer existiert bereits!"
+    exit 1
 fi
 
-# Docker installieren
-if [ "$INSTALL_DOCKER" = "yes" ]; then
-    echo "Installiere Docker..."
+# Passwort (verdeckt)
+read -s -p "Passwort festlegen: " PASSWORD
+echo
+read -s -p "Passwort wiederholen: " PASSWORD2
+echo
+
+if [ "$PASSWORD" != "$PASSWORD2" ]; then
+    echo "❌ Passwörter stimmen nicht überein!"
+    exit 1
+fi
+
+# sudo installieren?
+read -p "sudo installieren? (j/n): " INSTALL_SUDO
+
+if [[ "$INSTALL_SUDO" =~ ^[Jj]$ ]]; then
     apt update
+    apt install -y sudo
+fi
+
+# Root-/Sudo-Rechte?
+read -p "Soll der Benutzer sudo/root Rechte bekommen? (j/n): " GIVE_SUDO
+
+# Docker installieren?
+read -p "Docker + Docker Compose installieren? (j/n): " INSTALL_DOCKER
+
+echo
+echo "🚀 Starte Installation..."
+echo
+
+# Benutzer erstellen
+adduser --disabled-password --gecos "" "$USERNAME"
+echo "$USERNAME:$PASSWORD" | chpasswd
+
+if [[ "$GIVE_SUDO" =~ ^[Jj]$ ]]; then
+    usermod -aG sudo "$USERNAME"
+    echo "✔ Benutzer zur sudo-Gruppe hinzugefügt."
+fi
+
+# Docker Installation
+if [[ "$INSTALL_DOCKER" =~ ^[Jj]$ ]]; then
+    echo "🐳 Installiere Docker..."
+
     apt install -y ca-certificates curl gnupg lsb-release
 
-    mkdir -p /etc/apt/keyrings
+    install -m 0755 -d /etc/apt/keyrings
     curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    chmod a+r /etc/apt/keyrings/docker.gpg
 
     echo \
       "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-      $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+      $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
+      | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
     apt update
     apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
     usermod -aG docker "$USERNAME"
-    echo "Docker installiert und $USERNAME zur Docker-Gruppe hinzugefügt."
+
+    echo "✔ Docker installiert."
 fi
 
-echo "Bootstrap abgeschlossen!"
+echo
+echo "=============================="
+echo "✅ Setup abgeschlossen!"
+echo "Benutzer: $USERNAME"
+echo "=============================="
