@@ -88,3 +88,7 @@ echo "=============================="
 echo "✅ Setup abgeschlossen!"
 echo "Benutzer: $USERNAME"
 echo "=============================="
+echo "Teste Docker Version"
+docker --version
+docker compose version
+echo "=============================="
