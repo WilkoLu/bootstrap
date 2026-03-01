@@ -90,5 +90,41 @@ echo "Benutzer: $USERNAME"
 echo "=============================="
 echo "Teste Docker Version"
 docker --version
+
+# ==========================
+# Docker Compose Template Setup
+# ==========================
+
+if [[ "$INSTALL_DOCKER" =~ ^[Jj]$ ]]; then
+
+    echo
+    echo "=============================="
+    echo " Docker Compose Template Setup"
+    echo "=============================="
+
+    read -p "Hostname für Watchtower: " HOSTNAME
+    read -p "E-Mail Adresse (From) für Watchtower: " EMAIL_FROM
+    read -s -p "Passwort für Watchtower Mail Account: " EMAIL_PASS
+    echo
+
+    # Verzeichnis für Compose
+    COMPOSE_DIR="/opt/docker-compose"
+    mkdir -p "$COMPOSE_DIR"
+    cd "$COMPOSE_DIR" || exit
+
+    echo "Lade Docker Compose Template von GitHub..."
+    wget -O docker-compose.yml --no-cache "https://raw.githubusercontent.com/WilkoLu/bootstrap/refs/heads/main/docker-compose.yml"
+
+    # .env Datei erzeugen
+    cat > .env <<EOF
+WATCHTOWER_HOSTNAME=$HOSTNAME
+WATCHTOWER_EMAIL_FROM=$EMAIL_FROM
+WATCHTOWER_EMAIL_PASSWORD=$EMAIL_PASS
+WATCHTOWER_EMAIL_TO=wilko@luhring.de
+WATCHTOWER_EMAIL_SERVER=mail.luhring.de
+EOF
+
+    echo "✅ Docker Compose Setup abgeschlossen!"
+fi
 docker compose version
 echo "=============================="
