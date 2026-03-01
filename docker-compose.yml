@@ -1,0 +1,36 @@
+services:
+  watchtower:
+    image: nickfedor/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      TZ: Europe/Berlin
+      WATCHTOWER_LABEL_ENABLE: "true"
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_POLL_INTERVAL: 21600
+      WATCHTOWER_SELF_UPDATE: "true"
+      WATCHTOWER_NOTIFICATIONS: "email"
+      WATCHTOWER_NOTIFICATIONS_HOSTNAME: "${WATCHTOWER_HOSTNAME}"
+      WATCHTOWER_NOTIFICATION_EMAIL_FROM: "${WATCHTOWER_EMAIL_FROM}"
+      WATCHTOWER_NOTIFICATION_EMAIL_TO: "${WATCHTOWER_EMAIL_TO}
+      WATCHTOWER_NOTIFICATION_EMAIL_SERVER: "${WATCHTOWER_EMAIL_SERVER}"
+      WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PORT: 587
+      WATCHTOWER_NOTIFICATION_EMAIL_SERVER_USER: "${WATCHTOWER_EMAIL_FROM}"
+      WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PASSWORD: "${WATCHTOWER_EMAIL_PASSWORD}"
+      WATCHTOWER_NOTIFICATION_EMAIL_DELAY: 2
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  portainer-agent:
+    image: portainer/agent:latest
+    container_name: portainer-agent
+    restart: unless-stopped
+    ports:
+      - "9001:9001"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
