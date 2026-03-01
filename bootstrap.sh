@@ -108,7 +108,7 @@ if [[ "$INSTALL_DOCKER" =~ ^[Jj]$ ]]; then
     echo
 
     # Verzeichnis für Compose
-    COMPOSE_DIR="/home/$USERNAME"
+    COMPOSE_DIR="/home/$USERNAME/docker"
     mkdir -p "$COMPOSE_DIR"
     cd "$COMPOSE_DIR" || exit
 
@@ -123,6 +123,8 @@ WATCHTOWER_EMAIL_PASSWORD=$EMAIL_PASS
 WATCHTOWER_EMAIL_TO=wilko@luhring.de
 WATCHTOWER_EMAIL_SERVER=mail.luhring.de
 EOF
+
+    chown -R $USERNAME:$USERNAME /home/$USERNAME/docker
 
     echo "✅ Docker Compose Setup abgeschlossen!"
 fi
