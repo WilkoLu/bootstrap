@@ -108,7 +108,7 @@ if [[ "$INSTALL_DOCKER" =~ ^[Jj]$ ]]; then
     echo
 
     # Verzeichnis für Compose
-    COMPOSE_DIR="/opt/docker-compose"
+    COMPOSE_DIR="/Home/$USERNAME"
     mkdir -p "$COMPOSE_DIR"
     cd "$COMPOSE_DIR" || exit
 
