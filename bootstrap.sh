@@ -103,7 +103,6 @@ if [[ "$INSTALL_DOCKER" =~ ^[Jj]$ ]]; then
     echo "=============================="
 
     read -p "Hostname für Watchtower: " HOSTNAME
-    read -p "E-Mail Adresse (From) für Watchtower: " EMAIL_FROM
     read -s -p "Passwort für Watchtower Mail Account: " EMAIL_PASS
     echo
 
@@ -118,7 +117,7 @@ if [[ "$INSTALL_DOCKER" =~ ^[Jj]$ ]]; then
     # .env Datei erzeugen
     cat > .env <<EOF
 WATCHTOWER_HOSTNAME=$HOSTNAME
-WATCHTOWER_EMAIL_FROM=$EMAIL_FROM
+WATCHTOWER_EMAIL_FROM=watchtower@luhring.de
 WATCHTOWER_EMAIL_PASSWORD=$EMAIL_PASS
 WATCHTOWER_EMAIL_TO=wilko@luhring.de
 WATCHTOWER_EMAIL_SERVER=mail.luhring.de
