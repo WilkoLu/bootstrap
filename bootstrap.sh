@@ -159,19 +159,19 @@ if [[ "$INSTALL_SNMP" =~ ^[Jj]$ ]]; then
 agentAddress udp:161
 rocommunity $SNMP_COMMUNITY
 sysLocation "Homelab"
-sysContact "wilko@luhring.det"
+sysContact "wilko@luhring.de"
 EOF
     else
         cat > /etc/snmp/snmpd.conf <<EOF
 agentAddress udp:161
 rocommunity $SNMP_COMMUNITY $SNMP_NET
 sysLocation "Homelab"
-sysContact "admin@localhost"
+sysContact "wilko@luhring.de"
 EOF
     fi
 
     systemctl restart snmpd
     systemctl enable snmpd
 
-    echo "✔ SNMP installiert und gestartet."
+    echo "✔ SNMP installiert und gestartet." 
 fi
