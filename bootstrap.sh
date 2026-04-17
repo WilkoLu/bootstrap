@@ -159,7 +159,7 @@ if [[ "$INSTALL_SNMP" =~ ^[Jj]$ ]]; then
 agentAddress udp:161
 rocommunity $SNMP_COMMUNITY
 sysLocation "Homelab"
-sysContact "admin@localhost"
+sysContact "wilko@luhring.det"
 EOF
     else
         cat > /etc/snmp/snmpd.conf <<EOF
