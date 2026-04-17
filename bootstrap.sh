@@ -129,3 +129,57 @@ EOF
 fi
 docker compose version
 echo "=============================="
+# ==========================
+# SNMP Setup
+# ==========================
+
+read -p "SNMP installieren und konfigurieren? (j/n): " INSTALL_SNMP
+
+if [[ "$INSTALL_SNMP" =~ ^[Jj]$ ]]; then
+    echo
+    echo "=============================="
+    echo " SNMP Setup"
+    echo "=============================="
+
+    read -p "SNMP Community String (z. B. homelab-monitoring): " SNMP_COMMUNITY
+    read -p "Netzwerk einschränken? (z. B. 192.168.178.0/24, leer = alle): " SNMP_NET
+
+    echo "📦 Installiere SNMP..."
+    apt update
+    apt install -y snmpd
+
+    echo "⚙️ Konfiguriere SNMP..."
+
+    # Backup der Originaldatei
+    cp /etc/snmp/snmpd.conf /etc/snmp/snmpd.conf.bak
+
+    # Neue Konfiguration
+    if [ -z "$SNMP_NET" ]; then
+        cat > /etc/snmp/snmpd.conf <<EOF
+agentAddress udp:161
+rocommunity $SNMP_COMMUNITY
+sysLocation "Homelab"
+sysContact "admin@localhost"
+EOF
+    else
+        cat > /etc/snmp/snmpd.conf <<EOF
+agentAddress udp:161
+rocommunity $SNMP_COMMUNITY $SNMP_NET
+sysLocation "Homelab"
+sysContact "admin@localhost"
+EOF
+    fi
+
+    systemctl restart snmpd
+    systemctl enable snmpd
+
+    echo "✔ SNMP installiert und gestartet."
+
+    echo
+    echo "🧪 Teste SNMP lokal:"
+    snmpwalk -v2c -c $SNMP_COMMUNITY localhost | head -n 5
+
+    echo
+    echo "👉 Test von extern (z. B. Scanopy):"
+    echo "snmpwalk -v2c -c $SNMP_COMMUNITY <SERVER-IP>"
+fi
