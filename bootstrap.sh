@@ -174,12 +174,4 @@ EOF
     systemctl enable snmpd
 
     echo "✔ SNMP installiert und gestartet."
-
-    echo
-    echo "🧪 Teste SNMP lokal:"
-    snmpwalk -v2c -c $SNMP_COMMUNITY localhost | head -n 5
-
-    echo
-    echo "👉 Test von extern (z. B. Scanopy):"
-    echo "snmpwalk -v2c -c $SNMP_COMMUNITY <SERVER-IP>"
 fi
