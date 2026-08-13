@@ -24,7 +24,7 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"
 
   portainer-agent:
-    image: portainer/agent:latest
+    image: portainer/agent:sts
     container_name: portainer-agent
     restart: unless-stopped
     ports:
